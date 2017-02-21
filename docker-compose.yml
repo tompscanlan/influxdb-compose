@@ -1,0 +1,40 @@
+influxdb:
+  image: influxdb:latest
+  container_name: influxdb
+  ports:
+    - "8083:8083"
+    - "8086:8086"
+  volumes:
+    - ./influxdb.conf:/etc/influxdb/influxdb.conf:ro
+  command: -config /etc/influxdb/influxdb.conf influxdb
+
+  environment:
+    - INFLUXDB_DATA_ENGINE=tsm1
+
+telegraf:
+  image: telegraf:latest
+  container_name: telegraf
+  links:
+    - influxdb
+  volumes:
+    - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+
+chronograf:
+  image: chronograf:latest
+  container_name: chronograf
+  ports:
+    - "8888:10001"
+  links:
+    - influxdb
+  volumes:
+    - ./chronograf.conf:/etc/chronograf/chronograf.conf:ro
+
+kapacitor:
+  image: kapacitor:latest
+  container_name: kapacitor
+  ports:
+    - "9092:9092"
+  links:
+    - influxdb
+  volumes:
+    - ./kapacitor.conf:/etc/kapacitor/kapacitor.conf:ro
